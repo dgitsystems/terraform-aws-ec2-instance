@@ -76,6 +76,28 @@ resource "aws_instance" "this" {
   placement_group                      = var.placement_group
   tenancy                              = var.tenancy
 
+  //DGIT Custom
+
+
+  lifecycle {
+    ignore_changes = [
+      # Ignore changes to tags, e.g. because a management agent
+      # updates these based on some ruleset managed elsewhere.
+      ami,
+      ebs_optimized,
+      root_block_device,
+      user_data_base64,
+      user_data
+    ]
+  }
+
+  #Metadata force v2
+  metadata_options {
+    http_tokens = "required"
+    http_endpoint = "enabled"
+  }
+
+
   tags = merge(
     {
       "Name" = var.instance_count > 1 || var.use_num_suffix ? format("%s${var.num_suffix_format}", var.name, count.index + 1) : var.name
